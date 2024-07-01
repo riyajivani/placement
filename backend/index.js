@@ -48,9 +48,9 @@ app.post('/confirm', async (req, res) => {
 
      try {
           for (const row of data) {
-               let existingCompany = await Company.findOne({
+               let existingCompany = await Company.findOne({ 
                     name: row.companyName,
-                    email: row.companyEmail,
+                    email: row.companyEmail
                }).session(session);
 
                if (!existingCompany) {
@@ -77,26 +77,8 @@ app.post('/confirm', async (req, res) => {
                     });
 
                     await contact.save({ session });
-
                } else {
-                    let existingContact = await Contact.findOne({
-                         company: existingCompany._id,
-                         name: row.contactName,
-                         email: row.contactEmail,
-                    }).session(session);
-
-                    if (!existingContact) {
-                         const contact = new Contact({
-                              name: row.contactName,
-                              email: row.contactEmail,
-                              phone: row.contactPhone,
-                              dateOfBirth: row.dateOfBirth,
-                              contactType: row.contactType,
-                              company: existingCompany._id,
-                         });
-
-                         await contact.save({ session });
-                    }
+                    console.log(`Company '${row.companyName}' already exists. Skipping...`);
                }
           }
 
@@ -107,10 +89,11 @@ app.post('/confirm', async (req, res) => {
      } catch (error) {
           await session.abortTransaction();
           session.endSession();
-          console.error(error);
+          console.error('Error saving data:', error);
           res.status(500).send('Error saving data');
      }
 });
+
 
 app.listen(5000, () => {
      console.log('Server running on http://localhost:5000');

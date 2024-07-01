@@ -40,6 +40,9 @@ function Home() {
                const res = await axios.post('http://localhost:5000/confirm', { data: data });
                console.log(res)
                console.log('Data successfully added to database');
+               setIsReview(true);
+               window.location.reload()
+
           } catch (err) {
                setError('Error confirming data');
           }
