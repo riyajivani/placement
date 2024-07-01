@@ -11,6 +11,23 @@
      font-size: 30px;
 }
 
+.table-container {
+     margin-top: 20px;
+   }
+   
+   .table-container table {
+     width: 100%;
+     border-collapse: collapse;
+     border: 1px solid grey;
+   }
+   
+   .table-container th,
+   .table-container td {
+     border: 1px solid grey;
+     padding: 8px;
+     text-align: left;
+   }
+   
 .btns{
      display: flex;
      gap: 20px;
@@ -41,3 +58,5 @@
      font-size: 20px;
      text-align: center;
 }
+
+

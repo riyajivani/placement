@@ -46,6 +46,7 @@ function Home() {
      const handleCancel = () => {
           setData([]);
           setFile(null)
+          window.location.reload()
      }
 
      return (
@@ -65,8 +66,8 @@ function Home() {
                     )
                     :
                     (<>
-                         <div>
-                              {/* <table>
+                         <div className='table-container'>
+                              <table>
                                    <thead>
                                         <tr>
                                              <th>Company Name</th>
@@ -103,8 +104,7 @@ function Home() {
                                              </tr>
                                         ))}
                                    </tbody>
-                              </table> */}
-                              <button onClick={handleConfirm}>Confirm</button>
+                              </table>
                          </div>
                          <div className="btns">
                               <button className='btn-yes' onClick={handleConfirm}>confirm</button>
