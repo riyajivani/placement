@@ -41,34 +41,63 @@ app.post('/upload', upload.single('file'), (req, res) => {
 app.post('/confirm', async (req, res) => {
      const data = req.body.data;
 
+     console.log("Received data to confirm:", data);
+
      const session = await mongoose.startSession();
      session.startTransaction();
 
      try {
           for (const row of data) {
-               const company = new Company({
+               let existingCompany = await Company.findOne({
                     name: row.companyName,
-                    address: row.companyAddress,
-                    phone: row.companyPhone,
                     email: row.companyEmail,
-                    website: row.companyWebsite,
-                    numberOfEmployees: row.numberOfEmployees,
-                    foundedDate: row.foundedDate,
-                    industryType: row.industryType,
-               });
+               }).session(session);
 
-               const savedCompany = await company.save({ session });
+               if (!existingCompany) {
+                    const company = new Company({
+                         name: row.companyName,
+                         address: row.companyAddress,
+                         phone: row.companyPhone,
+                         email: row.companyEmail,
+                         website: row.companyWebsite,
+                         numberOfEmployees: row.numberOfEmployees,
+                         foundedDate: row.foundedDate,
+                         industryType: row.industryType,
+                    });
 
-               const contact = new Contact({
-                    name: row.contactName,
-                    email: row.contactEmail,
-                    phone: row.contactPhone,
-                    dateOfBirth: row.dateOfBirth,
-                    contactType: row.contactType,
-                    company: savedCompany._id,
-               });
+                    const savedCompany = await company.save({ session });
 
-               await contact.save({ session });
+                    const contact = new Contact({
+                         name: row.contactName,
+                         email: row.contactEmail,
+                         phone: row.contactPhone,
+                         dateOfBirth: row.dateOfBirth,
+                         contactType: row.contactType,
+                         company: savedCompany._id,
+                    });
+
+                    await contact.save({ session });
+
+               } else {
+                    let existingContact = await Contact.findOne({
+                         company: existingCompany._id,
+                         name: row.contactName,
+                         email: row.contactEmail,
+                    }).session(session);
+
+                    if (!existingContact) {
+                         const contact = new Contact({
+                              name: row.contactName,
+                              email: row.contactEmail,
+                              phone: row.contactPhone,
+                              dateOfBirth: row.dateOfBirth,
+                              contactType: row.contactType,
+                              company: existingCompany._id,
+                         });
+
+                         await contact.save({ session });
+                    }
+               }
           }
 
           await session.commitTransaction();
@@ -78,6 +107,7 @@ app.post('/confirm', async (req, res) => {
      } catch (error) {
           await session.abortTransaction();
           session.endSession();
+          console.error(error);
           res.status(500).send('Error saving data');
      }
 });

@@ -35,8 +35,10 @@ function Home() {
 
      const handleConfirm = async () => {
           console.log("submitted")
+          console.log(data)
           try {
-               await axios.post('http://localhost:5000/confirm', { data });
+               const res = await axios.post('http://localhost:5000/confirm', { data: data });
+               console.log(res)
                console.log('Data successfully added to database');
           } catch (err) {
                setError('Error confirming data');
